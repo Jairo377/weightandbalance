@@ -1,31 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weight and Balance PA-38</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>PA-38-112 Performance Calculator</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
+            margin: 0;
+            padding: 10px;
             display: flex;
             flex-direction: column;
-            min-height: 100vh; /* Asegura que el cuerpo ocupe al menos 100% de la altura de la ventana */
+            justify-content: flex-start;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f5f5f5;
             font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0 10px;
-            background-color: #fcfdfd;
         }
-        main {
-            flex: 1; /* Permite que el contenido principal ocupe el espacio restante */
-        }
-        canvas {
-            background-color: #fcfdfd;
-            max-width: 100%;
-            margin: 0 auto;
-            margin-top: 20px;
-            margin-bottom: 40px;
-        }
-        /* Estilos de cuadricula.html */
         .contenedor {
             border: 2px solid #666;
             display: inline-block;
@@ -105,9 +99,9 @@
         }
         .etiqueta-eje-y {
             position: absolute;
-            left: 41px;
-            top: 70%;
-            transform: translateY(-50%) rotate(-90deg);
+            left: 41px; /* 35px (numbers container) + 6px (gap) */
+            top: 70%;   /* Vertically centered */
+            transform: translateY(-50%) rotate(-90deg); /* Center and rotate */
             transform-origin: left center;
             font-family: Arial, sans-serif;
             font-size: 11px;
@@ -123,9 +117,9 @@
             color: #333;
             text-align: center;
             margin: 0;
-            margin-bottom: 2px;
-            margin-top: 0;
-            line-height: 1.1;
+            margin-bottom: 2px; /* Small gap below text */
+            margin-top: 0;      /* Remove extra space above */
+            line-height: 1.1;   /* Slightly tighter line spacing */
         }
         .contenedor-wrapper {
             position: relative;
@@ -161,7 +155,7 @@
         .etiquetas-x-contenedor {
             display: flex;
             width: 480px;
-            margin-top: -8px;
+            margin-top: -8px; /* Move up closer to numbers */
         }
         .etiquetas-x-contenedor.segunda-grafica {
             width: 600px;
@@ -172,10 +166,11 @@
         }
         .etiqueta-x-der {
             flex: 0 0 150px;
-            text-align: left;
+            text-align: left; /* Align text to the left */
             margin-left: 0;
             padding-left: 0;
         }
+        /* Etiquetas específicas para segunda gráfica */
         .etiquetas-x-contenedor.segunda-grafica .etiqueta-x-izq {
             flex: 0 0 420px;
         }
@@ -184,38 +179,17 @@
             text-align: left;
         }
         .controles-container {
-            background-color: #fcfdfd;
-            padding: 0;
-            border: 1px solid black;
-            margin: 0 auto 20px auto;
-            width: calc(90% - 20px);
-            max-width: 880px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            overflow-x: auto;
-        }
-        .controls-table {
+            background-color: white;
+            padding: 15px;
+            border: 2px solid #666;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: flex-end;
             width: 100%;
-            border-collapse: collapse;
-        }
-        .controls-table th,
-        .controls-table td {
-            background-color: #fcfdfd;
-            border: 1px solid black;
-            padding: 12px 15px;
-            text-align: center;
-        }
-        .controls-table th {
-            font-family: Arial, sans-serif;
-            font-size: 14px;
-            font-weight: bold;
-        }
-        .controls-table input {
-            width: 100%;
-            max-width: 100px;
-            box-sizing: border-box;
-            text-align: center;
-            border: 1px solid #999;
-            padding: 4px;
+            max-width: 900px;
         }
         .control-grupo {
             display: flex;
@@ -242,7 +216,7 @@
         .error-message {
             display: none;
             color: #d32f2f;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: bold;
             margin-top: 3px;
         }
@@ -250,473 +224,266 @@
             display: block;
         }
         #calcular, #limpiar {
-            padding: 6px 14px;
-            background-color: #34495E;
+            padding: 10px 20px;
+            background-color: #4CAF50;
             color: white;
             border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-family: Arial, sans-serif;
-            font-size: 11px;
-            font-weight: bold;
-            min-height: 28px;
-            min-width: 75px;
-            margin: 2px;
-            display: inline-block;
-        }
-        #calcular:hover {
-            background-color: #ebbf0f;
-            color: #34495E;
-        }
-        #limpiar:hover {
-            background-color: #ebbf0f;
-            color: #34495E;
-        }
-        .controls-table td {
-            vertical-align: middle;
-        }
-        .resultado {
+            border-radius: 3px;
             font-family: Arial, sans-serif;
             font-size: 14px;
             font-weight: bold;
+            cursor: pointer;
+            min-height: 44px;
+            flex: 1 1 auto;
+            min-width: 100px;
+        }
+        #limpiar {
+            background-color: #f44336;
+        }
+        #calcular:hover {
+            background-color: #45a049;
+        }
+        #limpiar:hover {
+            background-color: #da190b;
+        }
+        .resultado {
+            font-family: Arial, sans-serif;
+            font-size: 15px;
+            font-weight: bold;
             color: #333;
-            padding: 12px;
-            background-color: white;
+            padding: 10px 12px;
+            background-color: #e8f5e9;
+            border-radius: 3px;
+            width: 100%;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             text-align: center;
             word-wrap: break-word;
             white-space: pre-line;
-            width: calc(90% - 20px);
-            max-width: 880px;
-            margin: 10px auto;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            border: 1px solid black;
-            min-height: 20px;
-        }
-        .resultado:empty {
-            display: none;
-        }
-        table {
-            width: 90%;
-            border-collapse: collapse;
-            margin: 0 auto 20px;
-            background-color: white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            table-layout: fixed;
-        }
-        table, th, td {
-            background-color: #fcfdfd;
-            border: 1px solid black;
-            text-align: center;
-        }
-        th, td {
-            padding: 8px;
-        }
-        input {
-            width: 100%;
-            max-width: 100px;
-            box-sizing: border-box;
-            text-align: center;
-        }
-        h1 {
-            text-align: center;
-            margin-bottom: 10px;
-            font-size: 20px;
-        }
-        .menu {
-            display: flex;
-            justify-content: space-between;
-            padding: 5px 10px;
-            background-color: #34495E;
-            color: white;
-        }
-        .menu span {
-            cursor: pointer;
-            color: #fcfdfd;
-            font-weight: bold;
-            position: relative;
-        }
-        .menu span:hover {
-            color: #ebbf0f;
-        }
-        .footer {
-            background-color: #34495E;
-            color: white;
-            font-size: 10px;
-            padding: 2px;
-            text-align: right;
-            width: 100%;
-            margin-top: 20px;
-        }
-        #warning {
-            color: red;
-            font-size: 12px;
-            text-align: center;
-            display: none;
-            margin-top: 10px;
         }
 
-        /* Media Queries para tabla de controles */
+        /* Media Queries para Responsive Design */
+
+        /* Tablet: 481px - 768px */
         @media (max-width: 768px) {
-            .controls-table th,
-            .controls-table td {
-                padding: 10px 12px;
+            body {
+                padding: 10px 5px;
+            }
+
+            .titulo-modelo {
+                font-size: 14px;
+            }
+
+            .titulo-performance {
                 font-size: 12px;
             }
-            .controls-table input {
-                max-width: 80px;
-                font-size: 13px;
-            }
-            #calcular, #limpiar {
-                padding: 5px 12px;
-                font-size: 10px;
-                min-width: 70px;
-                border-radius: 5px;
-            }
-        }
 
-        @media (max-width: 480px) {
-            body {
-                padding: 0 5px;
-            }
             .controles-container {
-                width: calc(95% - 10px);
+                padding: 12px;
+                gap: 10px;
             }
-            .controls-table th,
-            .controls-table td {
-                padding: 8px 10px;
+
+            .control-grupo {
+                min-width: 120px;
+            }
+
+            .control-grupo label {
                 font-size: 11px;
             }
-            .controls-table input {
-                max-width: 70px;
-                font-size: 12px;
-                padding: 3px;
+
+            .control-grupo input {
+                font-size: 13px;
+                padding: 7px 8px;
             }
+
             #calcular, #limpiar {
-                padding: 5px 10px;
-                font-size: 9px;
-                min-width: 65px;
-                border-radius: 4px;
-                margin: 2px;
+                font-size: 13px;
+                padding: 8px 15px;
             }
+
             .resultado {
-                width: calc(95% - 10px);
+                font-size: 13px;
+                padding: 8px 10px;
+            }
+
+            .etiqueta-temperatura {
+                font-size: 8px;
+            }
+
+            .etiqueta-y {
+                font-size: 8px;
+            }
+
+            .etiqueta-eje-x {
+                font-size: 10px;
+            }
+
+            .etiqueta-eje-y {
+                font-size: 10px;
+            }
+        }
+
+        /* Mobile: menos de 480px */
+        @media (max-width: 480px) {
+            body {
+                padding: 5px;
+            }
+
+            .controles-container {
+                padding: 10px;
+                gap: 8px;
+            }
+
+            .control-grupo {
+                flex: 1 1 100%;
+                min-width: 100%;
+            }
+
+            .control-grupo label {
+                font-size: 13px;
+            }
+
+            .control-grupo input {
+                font-size: 16px;
+                padding: 10px 12px;
+                min-height: 44px;
+            }
+
+            #calcular, #limpiar {
+                flex: 1 1 48%;
+                min-width: 48%;
+                font-size: 14px;
+                padding: 12px 15px;
+                min-height: 48px;
+            }
+
+            .resultado {
+                font-size: 13px;
+                padding: 10px 8px;
+                line-height: 1.3;
+            }
+
+            .titulo-modelo {
+                font-size: 14px;
+            }
+
+            .titulo-performance {
                 font-size: 12px;
+                margin-bottom: 5px;
+            }
+
+            /* Ajustar tamaños de texto en gráficas para mejor legibilidad */
+            .etiqueta-temperatura {
+                font-size: 9px;
+            }
+
+            .etiqueta-y {
+                font-size: 9px;
+            }
+
+            .etiqueta-eje-x {
+                font-size: 10px;
+            }
+
+            .etiqueta-eje-y {
+                font-size: 9px;
+            }
+        }
+
+        /* Mobile muy pequeño: menos de 360px */
+        @media (max-width: 360px) {
+            .resultado {
+                font-size: 12px;
+                padding: 8px 6px;
+            }
+
+            #calcular, #limpiar {
+                font-size: 13px;
+                padding: 10px 12px;
+            }
+
+            .control-grupo label {
+                font-size: 12px;
+            }
+
+            .titulo-modelo {
+                font-size: 13px;
+            }
+
+            .titulo-performance {
+                font-size: 11px;
             }
         }
     </style>
 </head>
 <body>
-
-    <div class="menu">
-        <div>
-            <span onclick="goToIndex()">Aircraft</span>
+    <div class="controles-container">
+        <div class="control-grupo">
+            <label for="temperatura">Temperatura (°C):</label>
+            <input type="number" id="temperatura" min="-30" max="40" step="1" placeholder="-30 a 40">
         </div>
+        <div class="control-grupo">
+            <label for="elevacion">Elevación del aeropuerto (pies):</label>
+            <input type="number" id="elevacion" min="0" max="7000" step="1" value="2021" placeholder="0 a 7000">
+        </div>
+        <div class="control-grupo">
+            <label for="viento">Viento (0-15 knots):</label>
+            <input type="number" id="viento" min="0" max="15" step="1" placeholder="0 a 15">
+            <span id="error-viento" class="error-message"></span>
+        </div>
+        <button id="calcular">Calcular</button>
+        <button id="limpiar">Limpiar</button>
+        <div id="resultado" class="resultado"></div>
     </div>
-
-    <main>
-        <h1>Weight and Balance PA-38</h1>
-
-        <!-- Table -->
-        <table>
-            <thead>
-                <tr>
-                    <th>PA-38</th>
-                    <th>Weight (lbs)</th>
-                    <th>Arm (inches)</th>
-                    <th>Moment (in-lb)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Basic empty weight</td>
-                    <td>1128</td>
-                    <td>73.2</td>
-                    <td><span id="moment0">82569.6</span></td>
-                </tr>
-                <tr>
-                    <td>Pilot</td>
-                    <td><input type="number" id="weight1" class="weight" step="1"></td>
-                    <td>85.5</td>
-                    <td><span id="moment1">0</span></td>
-                </tr>
-                <tr>
-                    <td>Co-pilot</td>
-                    <td><input type="number" id="weight2" class="weight" step="1"></td>
-                    <td>85.5</td>
-                    <td><span id="moment2">0</span></td>
-                </tr>
-                <tr>
-                    <td>Baggage (100 lb. Max)</td>
-                    <td><input type="number" id="weight3" class="weight" step="1" max="100"></td>
-                    <td>115</td>
-                    <td><span id="moment3">0</span></td>
-                </tr>
-                <tr>
-                    <td>
-                        <div>
-                            Fuel (32 gal. Max)
-                            <input type="number" id="fuelQty" min="0" max="32" step="0.1" placeholder="Qty (gal)" style="margin-top: 5px;" onchange="updateFuelWeightFromQty()">
-                        </div>
-                    </td>
-                    <td><input type="number" id="weight4" class="weight" step="0.1" max="192" style="margin-top: 5px;" onchange="updateFuelQtyFromWeight()"></td>
-                    <td>75.4</td>
-                    <td><span id="moment4">0</span></td>
-                </tr>
-                <tr>
-                    <td>Total</td>
-                    <td><span id="totalWeight">1128</span></td>
-                    <td></td>
-                    <td><span id="totalMoment">82569.6</span></td>
-                </tr>
-            </tbody>
-        </table>
-
-        <!-- Warning if CG is out of bounds -->
-        <div style="margin-bottom: 10px;text-align: center;" id="warning">CG Fuera de los límites</div>
-
-        <!-- CG Result display -->
-        <h3 style="text-align: center;"><span>CG = <span id="cgResult">73.2</span></span></h3>
-
-        <!-- Canvas for chart -->
-        <canvas id="cgEnvelopeChart" width="600" height="600"></canvas>
-
-        <!-- Contenido de cuadricula.html -->
-        <h1>Take Off and Landing Performance PA-38</h1>
-        <table class="controles-container controls-table">
-            <thead>
-                <tr>
-                    <th>Temperatura (°C)</th>
-                    <th>Elevación (feet)</th>
-                    <th>Viento (knots)</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>
-                        <input type="number" id="temperatura" min="-30" max="40" step="1" placeholder="-30 to 40">
-                    </td>
-                    <td>
-                        <input type="number" id="elevacion" min="0" max="7000" step="1" value="2021" placeholder="0 to 7000">
-                    </td>
-                    <td>
-                        <input type="number" id="viento" min="0" max="15" step="1" placeholder="0 to 15">
-                        <span id="error-viento" class="error-message"></span>
-                    </td>
-                    <td>
-                        <button id="calcular">Calcular</button>
-                        <button id="limpiar">Borrar</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-
-        <!-- Results display below table -->
-        <div id="resultado" class="resultado" style="margin-top: 10px;"></div>
-        <div class="titulo-principal">
-            <div class="titulo-modelo">PA-38-112</div>
-            <div class="titulo-performance">TAKE OFF PERFORMANCE</div>
-        </div>
-        <div class="grafica-scroll-container">
-            <div class="grafica-content">
-                <div class="contenedor-wrapper">
-                    <div class="contenedor">
-                        <div class="cuadricula" id="cuadricula">
-                            <div class="etiquetas-y-contenedor" id="etiquetas-y">
-                                <div class="etiqueta-eje-y">Take off ground roll - Feet</div>
-                            </div>
+    <div class="titulo-principal">
+        <div class="titulo-modelo">PA-38-112</div>
+        <div class="titulo-performance">TAKE OFF PERFORMANCE</div>
+    </div>
+    <div class="grafica-scroll-container">
+        <div class="grafica-content">
+            <div class="contenedor-wrapper">
+                <div class="contenedor">
+                    <div class="cuadricula" id="cuadricula">
+                        <div class="etiquetas-y-contenedor" id="etiquetas-y">
+                            <div class="etiqueta-eje-y">Take off ground roll - Feet</div>
                         </div>
                     </div>
                 </div>
-                <div class="etiquetas-contenedor" id="etiquetas"></div>
-                <div class="etiquetas-x-contenedor">
-                    <div class="etiqueta-x-izq etiqueta-eje-x">Outside air temp - C</div>
-                    <div class="etiqueta-x-der etiqueta-eje-x">Wind - knots</div>
-                </div>
+            </div>
+            <div class="etiquetas-contenedor" id="etiquetas"></div>
+            <div class="etiquetas-x-contenedor">
+                <div class="etiqueta-x-izq etiqueta-eje-x">Outside air temp - C</div>
+                <div class="etiqueta-x-der etiqueta-eje-x">Wind - knots</div>
             </div>
         </div>
+    </div>
 
-        <!-- Segunda gráfica: LANDING GROUND ROLL -->
-        <div class="titulo-principal" style="margin-top: 40px;">
-            <div class="titulo-modelo">PA-38-112</div>
-            <div class="titulo-performance">LANDING GROUND ROLL</div>
-        </div>
-        <div class="grafica-scroll-container">
-            <div class="grafica-content">
-                <div class="contenedor-wrapper">
-                    <div class="contenedor">
-                        <div class="cuadricula" id="cuadricula2">
-                            <div class="etiquetas-y-contenedor" id="etiquetas-y2">
-                                <div class="etiqueta-eje-y">Landing ground roll - Feet</div>
-                            </div>
+    <!-- Segunda gráfica: LANDING GROUND ROLL -->
+    <div class="titulo-principal" style="margin-top: 40px;">
+        <div class="titulo-modelo">PA-38-112</div>
+        <div class="titulo-performance">LANDING GROUND ROLL</div>
+    </div>
+    <div class="grafica-scroll-container">
+        <div class="grafica-content">
+            <div class="contenedor-wrapper">
+                <div class="contenedor">
+                    <div class="cuadricula" id="cuadricula2">
+                        <div class="etiquetas-y-contenedor" id="etiquetas-y2">
+                            <div class="etiqueta-eje-y">Landing ground roll - Feet</div>
                         </div>
                     </div>
                 </div>
-                <div class="etiquetas-contenedor" id="etiquetas2"></div>
-                <div class="etiquetas-x-contenedor segunda-grafica">
-                    <div class="etiqueta-x-izq etiqueta-eje-x">Outside air temp - C</div>
-                    <div class="etiqueta-x-der etiqueta-eje-x">Wind - knots</div>
-                </div>
+            </div>
+            <div class="etiquetas-contenedor" id="etiquetas2"></div>
+            <div class="etiquetas-x-contenedor segunda-grafica">
+                <div class="etiqueta-x-izq etiqueta-eje-x">Outside air temp - C</div>
+                <div class="etiqueta-x-der etiqueta-eje-x">Wind - knots</div>
             </div>
         </div>
-    </main>
-
-    <div class="footer">
-        <div style="text-align: right;margin-right: 10px;"> © Por Jairo Peñate - 2024 </div>
     </div>
-
     <script>
-        function goToIndex() {
-            window.location.href = "index.html";
-        }
-
-        // Function to format numbers
-        function formatNumber(num) {
-            return Number.isInteger(num) ? num.toString() : num.toFixed(1);
-        }
-
-        function updateFuelWeightFromQty() {
-            const fuelQty = parseFloat(document.getElementById('fuelQty').value) || 0;
-            const fuelWeight = fuelQty * 6; // 6 lbs per gallon
-            document.getElementById('weight4').value = fuelWeight;
-
-            // Change color of the fuelQty input based on its value
-            document.getElementById('fuelQty').style.color = fuelQty > 32 ? 'red' : 'black';
-
-            calculateMoment(); // Update moments and totals
-        }
-
-        function updateFuelQtyFromWeight() {
-            const fuelWeight = parseFloat(document.getElementById('weight4').value) || 0;
-            const fuelQty = fuelWeight / 6; // Convert weight back to gallons
-            document.getElementById('fuelQty').value = fuelQty;
-
-            // Change color of the fuelQty input based on its value
-            document.getElementById('fuelQty').style.color = fuelQty > 32 ? 'red' : 'black';
-
-            calculateMoment(); // Update moments and totals
-        }
-
-        // Function to calculate moments and update table
-        function calculateMoment() {
-            let totalWeight = 1128; // Initial value for basic empty weight
-            let totalMoment = 82569.6; // Initial moment for basic empty weight
-
-            // Loop through weight inputs to calculate moments
-            for (let i = 1; i <= 4; i++) {
-                const weight = parseFloat(document.getElementById(`weight${i}`).value) || 0;
-                const arm = parseFloat(document.querySelectorAll('tbody tr')[i].cells[2].innerText) || 0; // Get arm from the corresponding row
-                const moment = weight * arm;
-                document.getElementById(`moment${i}`).innerText = formatNumber(moment); // Use custom format function
-
-                totalWeight += weight;
-                totalMoment += moment;
-            }
-
-            // Update totals
-            const totalWeightElement = document.getElementById('totalWeight');
-            const totalMomentElement = document.getElementById('totalMoment');
-            totalWeightElement.innerText = formatNumber(totalWeight); // Use custom format function
-            totalMomentElement.innerText = formatNumber(totalMoment); // Use custom format function
-
-            // Change total weight color to red if over 1670
-            if (totalWeight > 1670) {
-                totalWeightElement.style.color = 'red';
-            } else {
-                totalWeightElement.style.color = 'black';
-            }
-
-            // Calculate CG result
-            const cgResult = totalMoment / totalWeight;
-            document.getElementById('cgResult').innerText = formatNumber(cgResult); // Use custom format function
-
-            // Update chart with new CG result and total weight
-            updateChart(cgResult, totalWeight);
-        }
-
-        // Attach event listeners to weight inputs
-        document.querySelectorAll('.weight').forEach(input => {
-            input.addEventListener('input', calculateMoment);
-        });
-
-        // Function to update the chart
-        function updateChart(cg, weight) {
-            userPoint.data = [{ x: cg, y: weight }];
-            chart.update();
-
-            // Display warning if user point is out of CG envelope bounds
-            const isOutOfEnvelope = cg < 72.4 || cg > 78.5 || weight > 1680 || weight < 1000;
-            document.getElementById('warning').style.display = isOutOfEnvelope ? 'block' : 'none';
-        }
-
-        // Data for the shaded area (CG Envelope)
-        const cgEnvelope = {
-            label: 'CG Limits',
-            data: [
-                { x: 72.4, y: 1000 }, { x: 72.4, y: 1280 },
-                { x: 73.6, y: 1670 }, { x: 78.5, y: 1670 },
-                { x: 78.5, y: 1000 } // Close the polygon by returning to the starting point
-            ],
-            backgroundColor: 'rgba(52, 73, 94, 0.1)',
-            borderColor: 'rgba(52, 73, 94, 1)',
-            borderWidth: 2,
-            fill: true,
-            pointRadius: 0,
-            tension: 0
-        };
-
-        // Initial dataset for user point
-        let userPoint = {
-            label: 'CG',
-            data: [],
-            backgroundColor: 'rgba(259, 210, 25, 1)',
-            borderColor: 'rgba(259, 210, 25, 1)',
-            borderWidth: 2,
-            pointRadius: 5,
-            showLine: true
-        };
-
-        // Chart setup
-        const ctx = document.getElementById('cgEnvelopeChart').getContext('2d');
-        const chart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                datasets: [userPoint, cgEnvelope]
-            },
-            options: {
-                scales: {
-                    x: {
-                        type: 'linear',
-                        position: 'bottom',
-                        title: {
-                            display: true,
-                            text: 'CG (inches)'
-                        },
-                        min: 72,
-                        max: 79,
-                        ticks: {
-                            stepSize: 1
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Weight (lbs)'
-                        },
-                        min: 1000,
-                        max: 1700,
-                        ticks: {
-                            stepSize: 100
-                        }
-                    }
-                }
-            }
-        });
-
-        // Initial calculation on load to ensure the chart shows initial data
-        calculateMoment();
-
-        // ========== CÓDIGO DE CUADRICULA.HTML ==========
         const cuadricula = document.getElementById('cuadricula');
         for (let i = 0; i < 80; i++) {
             const linea = document.createElement('div');
@@ -788,14 +555,16 @@
         svg.style.pointerEvents = 'none';
         svg.style.zIndex = '8';
         cuadricula.insertBefore(svg, cuadricula.firstChild);
-
         // Función para convertir temperatura (outside air temp) a coordenadas X
+        // Rango: -30 a 40 grados (lado izquierdo)
         function tempToX(temp) {
             const cuadro = 5 + ((temp + 30) / 10) * 5;
             return cuadro * 6;
         }
 
         // Función para convertir wind component a coordenadas X
+        // Rango: 0 a 15 (lado derecho)
+        // Wind 0 está en cuadro 55, wind 15 está en cuadro 70
         function windToX(wind) {
             const cuadro = 55 + (wind / 5) * 5;
             return cuadro * 6;
@@ -805,7 +574,6 @@
             const cuadrosDesdeAbajo = (valor - 500) / 100 * 5;
             return 360 - (cuadrosDesdeAbajo * 6);
         }
-
         const x1 = tempToX(-7.7);
         const y1 = valorToY(500);
         const x2 = tempToX(40);
@@ -819,16 +587,21 @@
         line.setAttribute('stroke-width', '2');
         svg.appendChild(line);
 
-        // Label "SEA LEVEL"
+        // Label "SEA LEVEL" en 0°C sobre la línea principal
+        // Calcular Y en la línea principal cuando X = 0°C
+        // Línea va de (-7.7, 500) a (40, 1160)
         const temp0 = 0;
         const x0 = tempToX(temp0);
+        // Interpolación lineal: y = y1 + (y2 - y1) * (x - x1) / (x2 - x1)
         const y0Linea = 500 + (1160 - 500) * (temp0 - (-7.7)) / (40 - (-7.7));
         const y0 = valorToY(y0Linea);
+
+        // Calcular el ángulo de la línea
         const angulo = Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
 
         const seaLevelText = document.createElementNS(svgNS, 'text');
         seaLevelText.setAttribute('x', x0);
-        seaLevelText.setAttribute('y', y0 - 8);
+        seaLevelText.setAttribute('y', y0 - 8); // 8px arriba de la línea
         seaLevelText.setAttribute('text-anchor', 'middle');
         seaLevelText.setAttribute('font-family', 'Arial, sans-serif');
         seaLevelText.setAttribute('font-size', '8');
@@ -841,7 +614,7 @@
         seaLevelText.textContent = 'SEA LEVEL';
         svg.appendChild(seaLevelText);
 
-        // Líneas del lado izquierdo
+        // Líneas del lado izquierdo (outside air temp: -30 a 40°)
         const lineasIzquierda = [
             { x1: -17, y1: 500, x2: 40, y2: 1310 },
             { x1: -26.5, y1: 500, x2: 40, y2: 1460 },
@@ -868,12 +641,18 @@
             newLine.setAttribute('stroke-width', '2');
             svg.appendChild(newLine);
 
+            // Agregar texto de elevación en las primeras 7 líneas (1000, 2000, 3000, etc.)
             if (index < 7) {
                 const elevacion = (index + 1) * 1000;
+
+                // Calcular posición en -10°C para mayor visibilidad
                 const tempLine = -10;
                 const xLine = tempToX(tempLine);
+                // Interpolación lineal para Y
                 const yLineaVal = coords.y1 + (coords.y2 - coords.y1) * (tempLine - coords.x1) / (coords.x2 - coords.x1);
                 const yLine = valorToY(yLineaVal);
+
+                // Calcular ángulo de la línea
                 const anguloLine = Math.atan2(lineY2 - lineY1, lineX2 - lineX1) * (180 / Math.PI);
 
                 const labelElevacion = document.createElementNS(svgNS, 'text');
@@ -893,7 +672,7 @@
             }
         });
 
-        // Líneas del lado derecho
+        // Líneas del lado derecho (wind component: 0 a 15)
         const lineasDerecha = [
             { x1: 0, y1: 800, x2: 15, y2: 550 },
             { x1: 0, y1: 930, x2: 15, y2: 690 },
@@ -919,21 +698,23 @@
         // ========== SEGUNDA GRÁFICA: LANDING GROUND ROLL ==========
         const cuadricula2 = document.getElementById('cuadricula2');
 
+        // Funciones de conversión para segunda gráfica
         function tempToX2(temp) {
-            const cuadro = ((temp + 20) / 10) * 10;
+            const cuadro = ((temp + 20) / 10) * 10; // -20 en cuadro 0, 40 en cuadro 60
             return cuadro * 6;
         }
 
         function windToX2(wind) {
-            const cuadro = 70 + (wind / 5) * 10;
+            const cuadro = 70 + (wind / 5) * 10; // 0 en cuadro 70, 15 en cuadro 100
             return cuadro * 6;
         }
 
         function valorToY2(valor) {
-            const cuadrosDesdeAbajo = (valor - 600) / 10;
-            return (40 * 6) - (cuadrosDesdeAbajo * 6);
+            const cuadrosDesdeAbajo = (valor - 600) / 10; // Cada cuadro = 10 pies
+            return (40 * 6) - (cuadrosDesdeAbajo * 6); // 240px total - offset
         }
 
+        // Líneas verticales (100 cuadros)
         for (let i = 0; i < 100; i++) {
             const linea = document.createElement('div');
             linea.className = 'linea-vertical';
@@ -950,6 +731,7 @@
             cuadricula2.appendChild(linea);
         }
 
+        // Líneas horizontales (40 cuadros)
         for (let i = 0; i < 40; i++) {
             const linea = document.createElement('div');
             linea.className = 'linea-horizontal';
@@ -962,43 +744,47 @@
             cuadricula2.appendChild(linea);
         }
 
+        // Etiquetas de temperatura (eje X): -20° a 40°
         const etiquetasContenedor2 = document.getElementById('etiquetas2');
         const temperaturas2 = [-20, -10, 0, 10, 20, 30, 40];
         temperaturas2.forEach((temp, index) => {
             const etiqueta = document.createElement('div');
             etiqueta.className = 'etiqueta-temperatura';
-            const posicion = (index * 10) * 6;
+            const posicion = (index * 10) * 6; // Cada 10 cuadros
             etiqueta.style.left = posicion + 'px';
             etiqueta.textContent = temp + '°';
             etiquetasContenedor2.appendChild(etiqueta);
         });
 
+        // Números de wind (0, 5, 10, 15)
         const numerosWind = [0, 5, 10, 15];
         numerosWind.forEach((num, index) => {
             const etiqueta = document.createElement('div');
             etiqueta.className = 'etiqueta-temperatura';
-            const posicion = (70 + (index * 10)) * 6;
+            const posicion = (70 + (index * 10)) * 6; // Desde cuadro 70, cada 10 cuadros
             etiqueta.style.left = posicion + 'px';
             etiqueta.textContent = num;
             etiquetasContenedor2.appendChild(etiqueta);
         });
 
+        // Etiquetas del eje Y: 600-1000
         const etiquetasY2 = document.getElementById('etiquetas-y2');
         const valorInicial2 = 600;
         const incremento2 = 100;
-        const cuadrosDisponibles2 = 5;
+        const cuadrosDisponibles2 = 5; // 600, 700, 800, 900, 1000
 
         for (let i = 0; i < cuadrosDisponibles2; i++) {
             const etiqueta = document.createElement('div');
             etiqueta.className = 'etiqueta-y';
-            const lineaDesdeAbajo = i * 10;
-            const posicion = (40 * 6) - (lineaDesdeAbajo * 6);
+            const lineaDesdeAbajo = i * 10; // Cada 10 cuadros = 100 pies
+            const posicion = (40 * 6) - (lineaDesdeAbajo * 6); // 240px - offset
             const valor = valorInicial2 + (i * incremento2);
             etiqueta.style.top = posicion + 'px';
             etiqueta.textContent = valor;
             etiquetasY2.appendChild(etiqueta);
         }
 
+        // Crear SVG para segunda gráfica
         const svg2 = document.createElementNS(svgNS, 'svg');
         svg2.style.position = 'absolute';
         svg2.style.top = '0';
@@ -1009,6 +795,7 @@
         svg2.style.zIndex = '8';
         cuadricula2.insertBefore(svg2, cuadricula2.firstChild);
 
+        // Líneas diagonales para Landing Ground Roll - Outside Temp
         const lineasTempLanding = [
             { x1: -20, y1: 622, x2: 40, y2: 770 },
             { x1: -20, y1: 669, x2: 40, y2: 830 },
@@ -1033,12 +820,17 @@
             newLine.setAttribute('stroke-width', '2');
             svg2.appendChild(newLine);
 
+            // Agregar etiquetas de elevación
             const etiquetas = ['SEA LEVEL', '2000', '4000', '6000', '8000'];
             if (index < 5) {
+                // Calcular posición en -10°C para mayor visibilidad
                 const tempLine = -10;
                 const xLine = tempToX2(tempLine);
+                // Interpolación lineal para Y
                 const yLineaVal = coords.y1 + (coords.y2 - coords.y1) * (tempLine - coords.x1) / (coords.x2 - coords.x1);
                 const yLine = valorToY2(yLineaVal);
+
+                // Calcular ángulo de la línea
                 const anguloLine = Math.atan2(lineY2 - lineY1, lineX2 - lineX1) * (180 / Math.PI);
 
                 const labelElevacion = document.createElementNS(svgNS, 'text');
@@ -1058,6 +850,7 @@
             }
         });
 
+        // Líneas diagonales para Landing Ground Roll - Wind
         const lineasWindLanding = [
             { x1: 0, y1: 703, x2: 8.7, y2: 600 },
             { x1: 0, y1: 750, x2: 12, y2: 600 },
@@ -1077,7 +870,7 @@
             svg2.appendChild(newLine);
         });
 
-        // Variables globales para almacenar elementos dibujados
+        // Variables globales para almacenar elementos dibujados - Take Off
         let puntoActual = null;
         let lineaVertical = null;
         let lineaHorizontal = null;
@@ -1085,6 +878,7 @@
         let lineaFinal = null;
         let etiquetaResultado = null;
 
+        // Variables globales para almacenar elementos dibujados - Landing
         let puntoActualLanding = null;
         let lineaVerticalLanding = null;
         let lineaHorizontalLanding = null;
@@ -1092,7 +886,9 @@
         let lineaFinalLanding = null;
         let etiquetaResultadoLanding = null;
 
+        // Función para calcular el punto de take-off performance
         function calcularTakeOffPoint(temperatura, elevacion) {
+            // Si es sea level (0 pies), usar la línea principal
             if (elevacion === 0) {
                 const yLinea = 500 + (1160 - 500) * (temperatura - (-7.7)) / (40 - (-7.7));
                 return {
@@ -1102,9 +898,11 @@
                 };
             }
 
+            // Identificar las líneas de elevación cercanas
             const elevacionInferior = Math.floor(elevacion / 1000) * 1000;
             const elevacionSuperior = Math.ceil(elevacion / 1000) * 1000;
 
+            // Casos especiales para elevaciones exactas
             if (elevacion === elevacionInferior && elevacion > 0) {
                 const indice = (elevacion / 1000) - 1;
                 const linea = lineasIzquierda[indice];
@@ -1117,9 +915,11 @@
                 };
             }
 
-            let lineaInferior, lineaSuperior;
+            // Interpolación entre dos líneas
+            let indiceInferior, indiceSuperior, lineaInferior, lineaSuperior;
 
             if (elevacionInferior === 0) {
+                // Interpolar entre línea principal (sea level) y primera línea (1000)
                 const yInferior = 500 + (1160 - 500) * (temperatura - (-7.7)) / (40 - (-7.7));
                 lineaSuperior = lineasIzquierda[0];
                 const ySuperior = lineaSuperior.y1 + (lineaSuperior.y2 - lineaSuperior.y1) *
@@ -1134,8 +934,8 @@
                     takeOffDistance: yFinal
                 };
             } else {
-                const indiceInferior = (elevacionInferior / 1000) - 1;
-                const indiceSuperior = (elevacionSuperior / 1000) - 1;
+                indiceInferior = (elevacionInferior / 1000) - 1;
+                indiceSuperior = (elevacionSuperior / 1000) - 1;
 
                 lineaInferior = lineasIzquierda[indiceInferior];
                 lineaSuperior = lineasIzquierda[indiceSuperior];
@@ -1157,7 +957,9 @@
             }
         }
 
+        // Función para calcular el punto de landing performance
         function calcularLandingPoint(temperatura, elevacion) {
+            // Si es sea level (0 pies), usar la línea principal (primera línea)
             if (elevacion === 0) {
                 const lineaSeaLevel = lineasTempLanding[0];
                 const yLinea = lineaSeaLevel.y1 + (lineaSeaLevel.y2 - lineaSeaLevel.y1) *
@@ -1169,11 +971,13 @@
                 };
             }
 
+            // Identificar las líneas de elevación cercanas (incrementos de 2000)
             const elevacionInferior = Math.floor(elevacion / 2000) * 2000;
             const elevacionSuperior = Math.ceil(elevacion / 2000) * 2000;
 
+            // Casos especiales para elevaciones exactas
             if (elevacion === elevacionInferior && elevacion > 0) {
-                const indice = (elevacion / 2000);
+                const indice = (elevacion / 2000); // 2000->1, 4000->2, 6000->3, 8000->4
                 const linea = lineasTempLanding[indice];
                 const yLinea = linea.y1 + (linea.y2 - linea.y1) *
                               (temperatura - linea.x1) / (linea.x2 - linea.x1);
@@ -1184,14 +988,16 @@
                 };
             }
 
-            let lineaInferior, lineaSuperior;
+            // Interpolación entre dos líneas
+            let indiceInferior, indiceSuperior, lineaInferior, lineaSuperior;
 
             if (elevacionInferior === 0) {
-                lineaInferior = lineasTempLanding[0];
+                // Interpolar entre línea principal (sea level) y primera línea (2000)
+                lineaInferior = lineasTempLanding[0]; // SEA LEVEL
                 const yInferior = lineaInferior.y1 + (lineaInferior.y2 - lineaInferior.y1) *
                                   (temperatura - lineaInferior.x1) / (lineaInferior.x2 - lineaInferior.x1);
 
-                lineaSuperior = lineasTempLanding[1];
+                lineaSuperior = lineasTempLanding[1]; // 2000
                 const ySuperior = lineaSuperior.y1 + (lineaSuperior.y2 - lineaSuperior.y1) *
                                   (temperatura - lineaSuperior.x1) / (lineaSuperior.x2 - lineaSuperior.x1);
 
@@ -1204,8 +1010,8 @@
                     landingDistance: yFinal
                 };
             } else {
-                const indiceInferior = (elevacionInferior / 2000);
-                const indiceSuperior = (elevacionSuperior / 2000);
+                indiceInferior = (elevacionInferior / 2000);
+                indiceSuperior = (elevacionSuperior / 2000);
 
                 lineaInferior = lineasTempLanding[indiceInferior];
                 lineaSuperior = lineasTempLanding[indiceSuperior];
@@ -1227,55 +1033,72 @@
             }
         }
 
+        // Función para encontrar las líneas más cercanas en wind = 0
         function encontrarLineasCercanasWind(yValor) {
             let lineaSuperior = null;
             let lineaInferior = null;
+            let indiceSuperior = -1;
+            let indiceInferior = -1;
 
             for (let i = 0; i < lineasDerecha.length; i++) {
                 const yLineaEnWind0 = lineasDerecha[i].y1;
 
+                // Línea superior: y1 <= yValor (más abajo o igual en la gráfica, mayor en valor)
                 if (yLineaEnWind0 <= yValor) {
                     if (lineaSuperior === null || yLineaEnWind0 > lineaSuperior.y1) {
                         lineaSuperior = lineasDerecha[i];
+                        indiceSuperior = i;
                     }
                 }
 
+                // Línea inferior: y1 > yValor (más arriba en la gráfica, menor en valor)
                 if (yLineaEnWind0 > yValor) {
                     if (lineaInferior === null || yLineaEnWind0 < lineaInferior.y1) {
                         lineaInferior = lineasDerecha[i];
+                        indiceInferior = i;
                     }
                 }
             }
 
-            return { lineaSuperior, lineaInferior };
+            return { lineaSuperior, lineaInferior, indiceSuperior, indiceInferior };
         }
 
+        // Función para encontrar las líneas más cercanas en wind = 0 (Landing)
         function encontrarLineasCercanasWindLanding(yValor) {
             let lineaSuperior = null;
             let lineaInferior = null;
+            let indiceSuperior = -1;
+            let indiceInferior = -1;
 
             for (let i = 0; i < lineasWindLanding.length; i++) {
                 const yLineaEnWind0 = lineasWindLanding[i].y1;
 
+                // Línea superior: y1 <= yValor (más abajo o igual en la gráfica, mayor en valor)
                 if (yLineaEnWind0 <= yValor) {
                     if (lineaSuperior === null || yLineaEnWind0 > lineaSuperior.y1) {
                         lineaSuperior = lineasWindLanding[i];
+                        indiceSuperior = i;
                     }
                 }
 
+                // Línea inferior: y1 > yValor (más arriba en la gráfica, menor en valor)
                 if (yLineaEnWind0 > yValor) {
                     if (lineaInferior === null || yLineaEnWind0 < lineaInferior.y1) {
                         lineaInferior = lineasWindLanding[i];
+                        indiceInferior = i;
                     }
                 }
             }
 
-            return { lineaSuperior, lineaInferior };
+            return { lineaSuperior, lineaInferior, indiceSuperior, indiceInferior };
         }
 
+        // Función para calcular punto con ajuste de viento
         function calcularPuntoConViento(yInicial, viento) {
+            // Encontrar líneas cercanas
             const { lineaSuperior, lineaInferior } = encontrarLineasCercanasWind(yInicial);
 
+            // Caso 1: Está exactamente sobre una línea
             if (lineaSuperior && lineaSuperior.y1 === yInicial) {
                 const yFinal = lineaSuperior.y1 + (lineaSuperior.y2 - lineaSuperior.y1) *
                                (viento - 0) / (15 - 0);
@@ -1286,12 +1109,15 @@
                 };
             }
 
+            // Caso 2: Interpolar entre dos líneas
             if (lineaSuperior && lineaInferior) {
+                // Calcular Y en cada línea para el viento dado
                 const ySuperior = lineaSuperior.y1 + (lineaSuperior.y2 - lineaSuperior.y1) *
                                   (viento - 0) / (15 - 0);
                 const yInferior = lineaInferior.y1 + (lineaInferior.y2 - lineaInferior.y1) *
                                   (viento - 0) / (15 - 0);
 
+                // Interpolar entre los dos valores Y
                 const factor = (yInicial - lineaInferior.y1) / (lineaSuperior.y1 - lineaInferior.y1);
                 const yFinal = yInferior + factor * (ySuperior - yInferior);
 
@@ -1302,6 +1128,7 @@
                 };
             }
 
+            // Caso 3: Solo una línea disponible (extremo)
             const lineaUsar = lineaSuperior || lineaInferior;
             if (lineaUsar) {
                 const yFinal = lineaUsar.y1 + (lineaUsar.y2 - lineaUsar.y1) *
@@ -1313,6 +1140,7 @@
                 };
             }
 
+            // Fallback: sin líneas disponibles, retornar valor sin ajuste
             return {
                 x: windToX(viento),
                 y: valorToY(yInicial),
@@ -1320,10 +1148,14 @@
             };
         }
 
+        // Función para calcular punto con ajuste de viento (Landing)
         function calcularPuntoConVientoLanding(yInicial, viento) {
+            // Encontrar líneas cercanas
             const { lineaSuperior, lineaInferior } = encontrarLineasCercanasWindLanding(yInicial);
 
+            // Caso 1: Está exactamente sobre una línea
             if (lineaSuperior && lineaSuperior.y1 === yInicial) {
+                // Limitar viento al máximo de la línea
                 const vientoLimitado = Math.min(viento, lineaSuperior.x2);
                 const yFinal = lineaSuperior.y1 + (lineaSuperior.y2 - lineaSuperior.y1) *
                                (vientoLimitado - lineaSuperior.x1) / (lineaSuperior.x2 - lineaSuperior.x1);
@@ -1334,18 +1166,23 @@
                 };
             }
 
+            // Caso 2: Interpolar entre dos líneas
             if (lineaSuperior && lineaInferior) {
+                // Limitar viento al máximo de cada línea
                 const vientoSuperiorLimitado = Math.min(viento, lineaSuperior.x2);
                 const vientoInferiorLimitado = Math.min(viento, lineaInferior.x2);
 
+                // Calcular Y en cada línea para el viento dado
                 const ySuperior = lineaSuperior.y1 + (lineaSuperior.y2 - lineaSuperior.y1) *
                                   (vientoSuperiorLimitado - lineaSuperior.x1) / (lineaSuperior.x2 - lineaSuperior.x1);
                 const yInferior = lineaInferior.y1 + (lineaInferior.y2 - lineaInferior.y1) *
                                   (vientoInferiorLimitado - lineaInferior.x1) / (lineaInferior.x2 - lineaInferior.x1);
 
+                // Interpolar entre los dos valores Y
                 const factor = (yInicial - lineaInferior.y1) / (lineaSuperior.y1 - lineaInferior.y1);
                 const yFinal = yInferior + factor * (ySuperior - yInferior);
 
+                // Usar el viento de la línea que tiene mayor rango para la posición X
                 const vientoFinal = Math.min(viento, Math.max(lineaSuperior.x2, lineaInferior.x2));
 
                 return {
@@ -1355,8 +1192,10 @@
                 };
             }
 
+            // Caso 3: Solo una línea disponible (extremo)
             const lineaUsar = lineaSuperior || lineaInferior;
             if (lineaUsar) {
+                // Limitar viento al máximo de la línea
                 const vientoLimitado = Math.min(viento, lineaUsar.x2);
                 const yFinal = lineaUsar.y1 + (lineaUsar.y2 - lineaUsar.y1) *
                                (vientoLimitado - lineaUsar.x1) / (lineaUsar.x2 - lineaUsar.x1);
@@ -1367,6 +1206,7 @@
                 };
             }
 
+            // Fallback: sin líneas disponibles, retornar valor sin ajuste
             return {
                 x: windToX2(viento),
                 y: valorToY2(yInicial),
@@ -1374,12 +1214,15 @@
             };
         }
 
+        // Función para dibujar el punto y las líneas guía
         function dibujarPunto(resultado, viento) {
+            // Limpiar dibujo anterior
             limpiarDibujo();
 
+            // Dibujar línea vertical desde la temperatura
             lineaVertical = document.createElementNS(svgNS, 'line');
             lineaVertical.setAttribute('x1', resultado.x);
-            lineaVertical.setAttribute('y1', 360);
+            lineaVertical.setAttribute('y1', 360); // Desde abajo
             lineaVertical.setAttribute('x2', resultado.x);
             lineaVertical.setAttribute('y2', resultado.y);
             lineaVertical.setAttribute('stroke', 'blue');
@@ -1387,22 +1230,25 @@
             lineaVertical.setAttribute('stroke-dasharray', '5,5');
             svg.appendChild(lineaVertical);
 
+            // Variables para punto final y distancia
             let puntoFinal = resultado;
             let distanciaFinal = resultado.takeOffDistance;
 
+            // Si hay viento, calcular ajuste
             if (viento && viento > 0) {
+                // Dibujar línea horizontal hasta el 0 de winds (cuadro 55)
                 lineaHorizontal = document.createElementNS(svgNS, 'line');
                 lineaHorizontal.setAttribute('x1', resultado.x);
                 lineaHorizontal.setAttribute('y1', resultado.y);
-                lineaHorizontal.setAttribute('x2', windToX(0));
+                lineaHorizontal.setAttribute('x2', windToX(0)); // Termina en el 0 de winds
                 lineaHorizontal.setAttribute('y2', resultado.y);
                 lineaHorizontal.setAttribute('stroke', 'blue');
                 lineaHorizontal.setAttribute('stroke-width', '1.5');
                 lineaHorizontal.setAttribute('stroke-dasharray', '5,5');
                 svg.appendChild(lineaHorizontal);
-
                 const puntoViento = calcularPuntoConViento(resultado.takeOffDistance, viento);
 
+                // Dibujar línea paralela desde wind=0 hasta viento ingresado
                 lineaParalela = document.createElementNS(svgNS, 'line');
                 lineaParalela.setAttribute('x1', windToX(0));
                 lineaParalela.setAttribute('y1', resultado.y);
@@ -1413,9 +1259,11 @@
                 lineaParalela.setAttribute('stroke-dasharray', '5,5');
                 svg.appendChild(lineaParalela);
 
+                // Dibujar línea horizontal final desde punto de viento hacia la derecha
                 lineaFinal = document.createElementNS(svgNS, 'line');
                 lineaFinal.setAttribute('x1', puntoViento.x);
                 lineaFinal.setAttribute('y1', puntoViento.y);
+                // Extender al menos 50px a la derecha del punto, o hasta 480 si es menor
                 lineaFinal.setAttribute('x2', Math.max(puntoViento.x + 50, 480));
                 lineaFinal.setAttribute('y2', puntoViento.y);
                 lineaFinal.setAttribute('stroke', 'blue');
@@ -1423,13 +1271,15 @@
                 lineaFinal.setAttribute('stroke-dasharray', '5,5');
                 svg.appendChild(lineaFinal);
 
+                // Actualizar punto final
                 puntoFinal = puntoViento;
                 distanciaFinal = puntoViento.takeOffDistance;
             } else {
+                // Si viento es 0, dibujar línea horizontal directamente hasta el borde derecho
                 lineaHorizontal = document.createElementNS(svgNS, 'line');
                 lineaHorizontal.setAttribute('x1', resultado.x);
                 lineaHorizontal.setAttribute('y1', resultado.y);
-                lineaHorizontal.setAttribute('x2', 480);
+                lineaHorizontal.setAttribute('x2', 480); // Hasta el borde derecho
                 lineaHorizontal.setAttribute('y2', resultado.y);
                 lineaHorizontal.setAttribute('stroke', 'blue');
                 lineaHorizontal.setAttribute('stroke-width', '1.5');
@@ -1437,6 +1287,7 @@
                 svg.appendChild(lineaHorizontal);
             }
 
+            // Dibujar el punto (en la posición final)
             puntoActual = document.createElementNS(svgNS, 'circle');
             puntoActual.setAttribute('cx', puntoFinal.x);
             puntoActual.setAttribute('cy', puntoFinal.y);
@@ -1446,6 +1297,7 @@
             puntoActual.setAttribute('stroke-width', '2');
             svg.appendChild(puntoActual);
 
+            // Etiqueta con el valor (en la posición final)
             etiquetaResultado = document.createElementNS(svgNS, 'text');
             etiquetaResultado.setAttribute('x', puntoFinal.x + 10);
             etiquetaResultado.setAttribute('y', puntoFinal.y - 10);
@@ -1459,15 +1311,19 @@
             etiquetaResultado.textContent = Math.round(distanciaFinal) + ' ft';
             svg.appendChild(etiquetaResultado);
 
+            // Retornar distancia final para mostrar en el resultado
             return distanciaFinal;
         }
 
+        // Función para dibujar el punto y las líneas guía (Landing)
         function dibujarPuntoLanding(resultado, viento) {
+            // Limpiar dibujo anterior
             limpiarDibujoLanding();
 
+            // Dibujar línea vertical desde la temperatura
             lineaVerticalLanding = document.createElementNS(svgNS, 'line');
             lineaVerticalLanding.setAttribute('x1', resultado.x);
-            lineaVerticalLanding.setAttribute('y1', 240);
+            lineaVerticalLanding.setAttribute('y1', 240); // Desde abajo (240px de altura)
             lineaVerticalLanding.setAttribute('x2', resultado.x);
             lineaVerticalLanding.setAttribute('y2', resultado.y);
             lineaVerticalLanding.setAttribute('stroke', 'blue');
@@ -1475,14 +1331,17 @@
             lineaVerticalLanding.setAttribute('stroke-dasharray', '5,5');
             svg2.appendChild(lineaVerticalLanding);
 
+            // Variables para punto final y distancia
             let puntoFinal = resultado;
             let distanciaFinal = resultado.landingDistance;
 
+            // Si hay viento, calcular ajuste
             if (viento && viento > 0) {
+                // Dibujar línea horizontal hasta el 0 de winds (cuadro 70)
                 lineaHorizontalLanding = document.createElementNS(svgNS, 'line');
                 lineaHorizontalLanding.setAttribute('x1', resultado.x);
                 lineaHorizontalLanding.setAttribute('y1', resultado.y);
-                lineaHorizontalLanding.setAttribute('x2', windToX2(0));
+                lineaHorizontalLanding.setAttribute('x2', windToX2(0)); // Termina en el 0 de winds
                 lineaHorizontalLanding.setAttribute('y2', resultado.y);
                 lineaHorizontalLanding.setAttribute('stroke', 'blue');
                 lineaHorizontalLanding.setAttribute('stroke-width', '1.5');
@@ -1491,6 +1350,7 @@
 
                 const puntoViento = calcularPuntoConVientoLanding(resultado.landingDistance, viento);
 
+                // Dibujar línea paralela desde wind=0 hasta viento ingresado
                 lineaParalelaLanding = document.createElementNS(svgNS, 'line');
                 lineaParalelaLanding.setAttribute('x1', windToX2(0));
                 lineaParalelaLanding.setAttribute('y1', resultado.y);
@@ -1501,9 +1361,11 @@
                 lineaParalelaLanding.setAttribute('stroke-dasharray', '5,5');
                 svg2.appendChild(lineaParalelaLanding);
 
+                // Dibujar línea horizontal final desde punto de viento hacia la derecha
                 lineaFinalLanding = document.createElementNS(svgNS, 'line');
                 lineaFinalLanding.setAttribute('x1', puntoViento.x);
                 lineaFinalLanding.setAttribute('y1', puntoViento.y);
+                // Extender al menos 50px a la derecha del punto, o hasta 600 si es menor
                 lineaFinalLanding.setAttribute('x2', Math.max(puntoViento.x + 50, 600));
                 lineaFinalLanding.setAttribute('y2', puntoViento.y);
                 lineaFinalLanding.setAttribute('stroke', 'blue');
@@ -1511,13 +1373,15 @@
                 lineaFinalLanding.setAttribute('stroke-dasharray', '5,5');
                 svg2.appendChild(lineaFinalLanding);
 
+                // Actualizar punto final
                 puntoFinal = puntoViento;
                 distanciaFinal = puntoViento.landingDistance;
             } else {
+                // Si viento es 0, dibujar línea horizontal directamente hasta el borde derecho
                 lineaHorizontalLanding = document.createElementNS(svgNS, 'line');
                 lineaHorizontalLanding.setAttribute('x1', resultado.x);
                 lineaHorizontalLanding.setAttribute('y1', resultado.y);
-                lineaHorizontalLanding.setAttribute('x2', 600);
+                lineaHorizontalLanding.setAttribute('x2', 600); // Hasta el borde derecho
                 lineaHorizontalLanding.setAttribute('y2', resultado.y);
                 lineaHorizontalLanding.setAttribute('stroke', 'blue');
                 lineaHorizontalLanding.setAttribute('stroke-width', '1.5');
@@ -1525,6 +1389,7 @@
                 svg2.appendChild(lineaHorizontalLanding);
             }
 
+            // Dibujar el punto (en la posición final)
             puntoActualLanding = document.createElementNS(svgNS, 'circle');
             puntoActualLanding.setAttribute('cx', puntoFinal.x);
             puntoActualLanding.setAttribute('cy', puntoFinal.y);
@@ -1534,6 +1399,7 @@
             puntoActualLanding.setAttribute('stroke-width', '2');
             svg2.appendChild(puntoActualLanding);
 
+            // Etiqueta con el valor (en la posición final)
             etiquetaResultadoLanding = document.createElementNS(svgNS, 'text');
             etiquetaResultadoLanding.setAttribute('x', puntoFinal.x + 10);
             etiquetaResultadoLanding.setAttribute('y', puntoFinal.y - 10);
@@ -1547,9 +1413,11 @@
             etiquetaResultadoLanding.textContent = Math.round(distanciaFinal) + ' ft';
             svg2.appendChild(etiquetaResultadoLanding);
 
+            // Retornar distancia final para mostrar en el resultado
             return distanciaFinal;
         }
 
+        // Función para limpiar el dibujo
         function limpiarDibujo() {
             if (puntoActual) svg.removeChild(puntoActual);
             if (lineaVertical) svg.removeChild(lineaVertical);
@@ -1566,6 +1434,7 @@
             etiquetaResultado = null;
         }
 
+        // Función para limpiar el dibujo (Landing)
         function limpiarDibujoLanding() {
             if (puntoActualLanding) svg2.removeChild(puntoActualLanding);
             if (lineaVerticalLanding) svg2.removeChild(lineaVerticalLanding);
@@ -1582,11 +1451,13 @@
             etiquetaResultadoLanding = null;
         }
 
+        // Event listeners
         document.getElementById('calcular').addEventListener('click', function() {
             const temperatura = parseFloat(document.getElementById('temperatura').value);
             const elevacion = parseFloat(document.getElementById('elevacion').value);
             const viento = parseFloat(document.getElementById('viento').value) || 0;
 
+            // Validaciones
             if (isNaN(temperatura) || temperatura < -30 || temperatura > 40) {
                 alert('Por favor ingrese una temperatura válida entre -30 y 40°C');
                 return;
@@ -1602,12 +1473,15 @@
                 return;
             }
 
+            // Calcular y dibujar Take Off Performance
             const resultado = calcularTakeOffPoint(temperatura, elevacion);
             const distanciaFinalTakeOff = dibujarPunto(resultado, viento);
 
+            // Calcular y dibujar Landing Ground Roll
             const resultadoLanding = calcularLandingPoint(temperatura, elevacion);
             const distanciaFinalLanding = dibujarPuntoLanding(resultadoLanding, viento);
 
+            // Mostrar resultados
             const piesTakeOff = Math.round(distanciaFinalTakeOff);
             const metrosTakeOff = Math.round(distanciaFinalTakeOff * 0.3048);
             const piesLanding = Math.round(distanciaFinalLanding);
@@ -1627,16 +1501,19 @@
             document.getElementById('elevacion').value = '';
             document.getElementById('viento').value = '';
             document.getElementById('resultado').textContent = '';
+            // Limpiar mensaje de error de viento
             const errorViento = document.getElementById('error-viento');
             errorViento.classList.remove('visible');
             errorViento.textContent = '';
         });
 
+        // Validación en tiempo real del viento
         document.getElementById('viento').addEventListener('input', function() {
             const viento = parseFloat(this.value);
             const errorViento = document.getElementById('error-viento');
 
             if (this.value === '') {
+                // Campo vacío, no mostrar error
                 errorViento.classList.remove('visible');
                 errorViento.textContent = '';
             } else if (isNaN(viento) || viento < 0) {
@@ -1646,11 +1523,11 @@
                 errorViento.textContent = 'El viento máximo es 15 knots';
                 errorViento.classList.add('visible');
             } else {
+                // Valor válido, ocultar error
                 errorViento.classList.remove('visible');
                 errorViento.textContent = '';
             }
         });
     </script>
-
 </body>
 </html>
